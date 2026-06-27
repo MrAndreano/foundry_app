@@ -318,5 +318,5 @@
     };
   }
 
-  global.FoundryEngine = { calculateGatingSystem, getAlloy };
+  global.FoundryEngine = { calculateGatingSystem, getAlloy, calcStaticHead };
 })(typeof window !== "undefined" ? window : globalThis);

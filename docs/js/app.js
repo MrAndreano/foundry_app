@@ -1,5 +1,20 @@
+const LAYOUT_DIAGRAMS = {
+  side: { src: "img/head-side.svg", caption: "Боковая подводка: H<sub>р</sub> = H<sub>0</sub> − P − C/2 (рис. 2.3)" },
+  top: { src: "img/head-top.svg", caption: "Верхняя подводка: H<sub>р</sub> = H<sub>0</sub> (рис. 2.3)" },
+  siphon: { src: "img/head-siphon.svg", caption: "Сифонная подводка: H<sub>р</sub> = H<sub>0</sub> − C/2 (рис. 2.3)" },
+  symmetric: { src: "img/head-symmetric.svg", caption: "Симметричная подводка: H<sub>р</sub> = H<sub>0</sub> − C/8 (рис. 2.3)" },
+};
+
 function formatRatio(ratio) {
   return ratio.join(":");
+}
+
+function mmToM(mm) {
+  return mm != null && !Number.isNaN(mm) ? mm / 1000 : undefined;
+}
+
+function estimateWallThickness(massKg) {
+  return Math.round(Math.max(3, Math.min(40, 8 * Math.cbrt(massKg / 10))) * 10) / 10;
 }
 
 function updateAlloyInfo() {
@@ -28,6 +43,44 @@ function initAlloys() {
   updateAlloyInfo();
 }
 
+function updateLayoutDiagram() {
+  const layout = document.getElementById("gating_layout").value;
+  const cfg = LAYOUT_DIAGRAMS[layout] || LAYOUT_DIAGRAMS.side;
+  document.getElementById("layout-diagram").src = cfg.src;
+  document.getElementById("layout-caption").innerHTML = cfg.caption;
+
+  const pField = document.getElementById("p-field");
+  const pInput = document.getElementById("inlet_distance_mm");
+  if (layout === "top") {
+    pField.hidden = true;
+    pInput.value = 0;
+  } else if (layout === "siphon") {
+    pField.hidden = true;
+    pInput.value = document.getElementById("casting_height_mm").value || 0;
+  } else if (layout === "symmetric") {
+    pField.hidden = true;
+    const c = parseFloat(document.getElementById("casting_height_mm").value) || 0;
+    pInput.value = Math.round(c / 2);
+  } else {
+    pField.hidden = false;
+  }
+  updateHeadPreview();
+}
+
+function updateHeadPreview() {
+  const layout = document.getElementById("gating_layout").value;
+  const h0 = mmToM(parseFloat(document.getElementById("sprue_height_mm").value)) ?? 0.25;
+  const c = mmToM(parseFloat(document.getElementById("casting_height_mm").value)) ?? 0;
+  let p = mmToM(parseFloat(document.getElementById("inlet_distance_mm").value)) ?? 0;
+  if (layout === "top") p = 0;
+  else if (layout === "siphon") p = c;
+  else if (layout === "symmetric") p = c / 2;
+
+  const [hr, formula] = FoundryEngine.calcStaticHead(layout, h0, c, p);
+  document.getElementById("head-preview").innerHTML =
+    `Расчётный H<sub>р</sub> ≈ <strong>${hr.toFixed(3).replace(".", ",")} м</strong> · ${formula}`;
+}
+
 function num(form, name) {
   const v = form.elements[name]?.value;
   return v !== undefined && v !== "" ? parseFloat(v) : undefined;
@@ -39,45 +92,67 @@ function int(form, name) {
 }
 
 function buildPayload(form) {
+  let wallMm = num(form, "wall_thickness_mm");
+  const mass = num(form, "casting_mass_kg");
+  const wallAuto = wallMm == null && mass != null;
+  if (wallAuto) wallMm = estimateWallThickness(mass);
+
+  const layout = form.gating_layout.value;
+  const cMm = num(form, "casting_height_mm") ?? 0;
+  let pMm = num(form, "inlet_distance_mm") ?? 0;
+  if (layout === "top") pMm = 0;
+  else if (layout === "siphon") pMm = cMm;
+  else if (layout === "symmetric") pMm = cMm / 2;
+
   const p = {
     alloy_id: form.alloy_id.value,
-    casting_mass_kg: num(form, "casting_mass_kg"),
+    casting_mass_kg: mass,
     riser_mass_kg: num(form, "riser_mass_kg") ?? 0,
     castings_per_mold: int(form, "castings_per_mold") ?? 1,
-    wall_thickness_mm: num(form, "wall_thickness_mm"),
+    wall_thickness_mm: wallMm,
     feeder_count: int(form, "feeder_count") ?? 1,
     collector_count: int(form, "collector_count") ?? 1,
     mold_moisture: form.mold_moisture.value,
     filter_screen: form.filter_screen.checked,
     thin_walled: form.thin_walled.checked,
-    steel_wall_type: form.steel_wall_type.value,
-    feeder_attachment: form.feeder_attachment.value,
-    gating_layout: form.gating_layout.value,
-    sprue_height_m: num(form, "sprue_height_m"),
-    casting_height_m: num(form, "casting_height_m"),
-    inlet_distance_m: num(form, "inlet_distance_m"),
-    pouring_time_method: form.pouring_time_method.value,
-    iterate_mass: form.iterate_mass.checked,
-    sprue_shape: form.sprue_shape.value,
-    sprue_taper: form.sprue_taper.value,
-    sprue_draft_mm: num(form, "sprue_draft_mm"),
-    collector_shape: form.collector_shape.value,
-    feeder_shape: form.feeder_shape.value,
-    feeder_aspect_ratio: num(form, "feeder_aspect_ratio"),
-    slag_particle_diameter_mm: num(form, "slag_particle_diameter_mm"),
-    slag_density_kg_m3: num(form, "slag_density_kg_m3"),
+    steel_wall_type: form.steel_wall_type?.value ?? "thick",
+    feeder_attachment: form.feeder_attachment?.value ?? "to_riser",
+    gating_layout: layout,
+    sprue_height_m: mmToM(num(form, "sprue_height_mm")),
+    casting_height_m: mmToM(cMm),
+    inlet_distance_m: mmToM(pMm),
+    pouring_time_method: "auto",
+    iterate_mass: true,
+    sprue_shape: form.sprue_shape?.value ?? "circle",
+    sprue_taper: form.sprue_taper?.value ?? "constricting_down",
+    sprue_draft_mm: num(form, "sprue_draft_mm") ?? 5,
+    collector_shape: form.collector_shape?.value ?? "trapezoid",
+    feeder_shape: form.feeder_shape?.value ?? "trapezoid",
+    feeder_aspect_ratio: num(form, "feeder_aspect_ratio") ?? 3,
+    slag_particle_diameter_mm: 2,
+    slag_density_kg_m3: 4500,
+    _wall_auto: wallAuto,
   };
-  for (const k of ["static_head_m", "pouring_time_s", "pouring_time_coefficient_s", "discharge_coefficient", "overrun_factor", "feeder_length_m", "collector_length_m", "wall_thickness_at_feeder_mm", "area_ratio_feeder", "area_ratio_collector", "area_ratio_sprue", "pour_temperature_c", "carbon_equivalent"]) {
+
+  for (const k of ["static_head_m", "pouring_time_s", "discharge_coefficient", "overrun_factor", "area_ratio_feeder", "area_ratio_collector", "area_ratio_sprue"]) {
     const v = num(form, k);
     if (v !== undefined) p[k] = k === "overrun_factor" ? v / 100 : v;
   }
   const tol = num(form, "iteration_tolerance");
   if (tol !== undefined) p.iteration_tolerance = tol / 100;
+
   return p;
 }
 
-function renderResults(r) {
+function renderResults(r, payload) {
   document.getElementById("results").hidden = false;
+
+  const autoParts = [];
+  if (payload._wall_auto) autoParts.push(`δ ≈ ${payload.wall_thickness_mm} мм (оценка по массе)`);
+  autoParts.push(`τ: ${r.pouring_time_formula}`);
+  autoParts.push(`H<sub>р</sub>: ${r.static_head_formula}`);
+  document.getElementById("auto-info").innerHTML = `<p>Автоматически: ${autoParts.join(" · ")}</p>`;
+
   document.getElementById("summary").innerHTML = `
     <div class="stat"><div class="stat-label">Сплав</div><div class="stat-value">${r.alloy_name}</div></div>
     <div class="stat"><div class="stat-label">G total</div><div class="stat-value">${r.total_metal_mass_kg} кг</div></div>
@@ -115,19 +190,38 @@ function renderResults(r) {
   document.getElementById("notes").innerHTML = r.notes.map((n) => `<p class="${n.startsWith("⚠") ? "warning" : ""}">${n}</p>`).join("");
 }
 
-document.getElementById("alloy_id").addEventListener("change", updateAlloyInfo);
-document.getElementById("calc-form").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const form = e.target;
+function runCalculation(form) {
   form.querySelector(".error")?.remove();
   try {
-    renderResults(FoundryEngine.calculateGatingSystem(buildPayload(form), ALLOYS));
+    const payload = buildPayload(form);
+    renderResults(FoundryEngine.calculateGatingSystem(payload, ALLOYS), payload);
   } catch (err) {
     const div = document.createElement("div");
     div.className = "error";
     div.textContent = err.message;
     form.appendChild(div);
   }
+}
+
+document.getElementById("alloy_id").addEventListener("change", updateAlloyInfo);
+document.getElementById("gating_layout").addEventListener("change", updateLayoutDiagram);
+["sprue_height_mm", "casting_height_mm", "inlet_distance_mm"].forEach((id) => {
+  document.getElementById(id).addEventListener("input", () => {
+    const layout = document.getElementById("gating_layout").value;
+    if (layout === "siphon") {
+      document.getElementById("inlet_distance_mm").value = document.getElementById("casting_height_mm").value;
+    } else if (layout === "symmetric") {
+      const c = parseFloat(document.getElementById("casting_height_mm").value) || 0;
+      document.getElementById("inlet_distance_mm").value = Math.round(c / 2);
+    }
+    updateHeadPreview();
+  });
+});
+
+document.getElementById("calc-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  runCalculation(e.target);
 });
 
 initAlloys();
+updateLayoutDiagram();
