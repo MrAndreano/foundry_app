@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Калькулятор литниковой системы</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="layout layout-wide">
+    <header class="header">
+      <p class="eyebrow">Foundry Gating Calculator</p>
+      <h1>Расчёт литниковой системы</h1>
+      <p class="subtitle">Воронка → Стояк → Коллектор → Питатель · Озанн–Диттерт · работает offline на GitHub Pages</p>
+    </header>
+
+    <main class="grid">
+      <section class="card form-card">
+        <h2>Параметры расчёта</h2>
+        <form id="calc-form">
+
+          <fieldset class="form-section">
+            <legend>Сплав и отливка</legend>
+            <label>Сплав <select id="alloy_id" name="alloy_id" required></select></label>
+            <div id="alloy-info" class="alloy-info"></div>
+            <div class="row">
+              <label>Масса отливки, кг <input type="number" name="casting_mass_kg" value="12" min="0.01" step="0.01" required></label>
+              <label>Масса прибылей, кг <input type="number" name="riser_mass_kg" value="0" min="0" step="0.01"></label>
+            </div>
+            <div class="row">
+              <label>Отливок в форме <input type="number" name="castings_per_mold" value="1" min="1" max="32"></label>
+              <label>Толщина стенки δ, мм <input type="number" name="wall_thickness_mm" placeholder="для τ" min="0.1" step="0.1"></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-section">
+            <legend>Элементы системы</legend>
+            <div class="row row-3">
+              <label>Питателей <input type="number" name="feeder_count" value="6" min="1" max="32"></label>
+              <label>Коллекторов <input type="number" name="collector_count" value="1" min="1" max="8"></label>
+              <label>Тип формы
+                <select name="mold_moisture"><option value="wet">Сырая</option><option value="dry">Сухая</option></select>
+              </label>
+            </div>
+            <div class="row">
+              <label><input type="checkbox" name="filter_screen" value="1"> Фильтровальная сетка (Fф.с = Fп/1,1)</label>
+              <label><input type="checkbox" name="thin_walled" value="1"> Тонкостенная (1:1,06:1,11)</label>
+            </div>
+            <div class="row">
+              <label>Тип стенки (сталь)
+                <select name="steel_wall_type"><option value="thick">Толстостенная</option><option value="thin">Тонкостенная</option></select>
+              </label>
+              <label>Подключение питателя
+                <select name="feeder_attachment"><option value="to_riser">К прибыли</option><option value="to_casting">К отливке</option></select>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-section">
+            <legend>Статический напор Hр</legend>
+            <div class="row">
+              <label>Hр напрямую, м <input type="number" name="static_head_m" placeholder="Авто" min="0.01" step="0.001"></label>
+              <label>Схема подводки
+                <select name="gating_layout">
+                  <option value="side">Боковая (H₀−P−C/2)</option>
+                  <option value="top">Верхняя (H₀)</option>
+                  <option value="siphon">Сифонная (H₀−C/2)</option>
+                  <option value="symmetric">Симметричная (H₀−C/8)</option>
+                </select>
+              </label>
+            </div>
+            <div class="row row-3">
+              <label>H₀ — высота столба, м <input type="number" name="sprue_height_m" value="0.25" min="0.01" step="0.01"></label>
+              <label>C — высота отливки, м <input type="number" name="casting_height_m" value="0.034" min="0" step="0.001"></label>
+              <label>P — до точки подвода, м <input type="number" name="inlet_distance_m" value="0.012" min="0" step="0.001"></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-section">
+            <legend>Время заливки τ</legend>
+            <div class="row">
+              <label>τ вручную, с <input type="number" name="pouring_time_s" placeholder="Авто" min="0.1" step="0.1"></label>
+              <label>Метод расчёта τ
+                <select name="pouring_time_method">
+                  <option value="auto">Авто (2.2 / 2.3)</option>
+                  <option value="thin_sqrt">τ = S·√G (2.2)</option>
+                  <option value="large_cube">τ = δ·S·∛G (2.3)</option>
+                </select>
+              </label>
+              <label>Коэффициент S <input type="number" name="pouring_time_coefficient_s" placeholder="Из табл." min="0.1" step="0.01"></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-section">
+            <legend>Гидравлика и соотношения</legend>
+            <div class="row row-3">
+              <label>μ — коэфф. расхода <input type="number" name="discharge_coefficient" placeholder="Из базы" min="0.01" max="1" step="0.01"></label>
+              <label>Припуск на литник, % <input type="number" name="overrun_factor" placeholder="Из базы" min="0" max="100" step="1"></label>
+              <label>Допуск итерации, % <input type="number" name="iteration_tolerance" value="3" min="1" max="20" step="1"></label>
+            </div>
+            <div class="row row-3">
+              <label>Fпит <input type="number" name="area_ratio_feeder" placeholder="Авто" min="0.1" step="0.01"></label>
+              <label>Fколл <input type="number" name="area_ratio_collector" placeholder="Авто" min="0.1" step="0.01"></label>
+              <label>Fст <input type="number" name="area_ratio_sprue" placeholder="Авто" min="0.1" step="0.01"></label>
+            </div>
+            <label><input type="checkbox" name="iterate_mass" value="1" checked> Итерационное уточнение массы ЛПС (2.9–2.10)</label>
+          </fieldset>
+
+          <fieldset class="form-section">
+            <legend>Размеры элементов</legend>
+            <div class="row row-3">
+              <label>Длина питателя, м <input type="number" name="feeder_length_m" placeholder="Авто" min="0.01" step="0.01"></label>
+              <label>Длина коллектора, м <input type="number" name="collector_length_m" placeholder="Авто" min="0.01" step="0.01"></label>
+              <label>δ у питателя, мм <input type="number" name="wall_thickness_at_feeder_mm" placeholder="—" min="0.1" step="0.1"></label>
+            </div>
+            <div class="row row-3">
+              <label>Форма стояка <select name="sprue_shape"><option value="circle">Круг</option><option value="square">Квадрат</option></select></label>
+              <label>Конус стояка <select name="sprue_taper"><option value="constricting_down">Суж. вниз</option><option value="expanding_up">Расш. вверх</option></select></label>
+              <label>Уклон стояка, мм <input type="number" name="sprue_draft_mm" value="5" min="0" step="0.5"></label>
+            </div>
+            <div class="row row-3">
+              <label>Форма коллектора <select name="collector_shape"><option value="trapezoid">Трапеция</option><option value="rectangle">Прямоугольник</option><option value="circle">Круг</option><option value="square">Квадрат</option></select></label>
+              <label>Форма питателя <select name="feeder_shape"><option value="trapezoid">Трапеция</option><option value="rectangle">Прямоугольник</option><option value="circle">Круг</option><option value="square">Квадрат</option></select></label>
+              <label>Соотн. сторон питателя <input type="number" name="feeder_aspect_ratio" value="3" min="1" max="10" step="0.1"></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-section">
+            <legend>Шлак и температура</legend>
+            <div class="row row-3">
+              <label>d шлака, мм <input type="number" name="slag_particle_diameter_mm" value="2" min="0.1" step="0.1"></label>
+              <label>ρ шлака, кг/м³ <input type="number" name="slag_density_kg_m3" value="4500" min="100" step="10"></label>
+              <label>T заливки, °C <input type="number" name="pour_temperature_c" placeholder="Из базы" min="100" step="1"></label>
+            </div>
+            <label>Сэкв (чугун) <input type="number" name="carbon_equivalent" placeholder="Авто" min="2" max="5" step="0.01"></label>
+          </fieldset>
+
+          <button type="submit" class="btn-primary">Рассчитать</button>
+        </form>
+      </section>
+
+      <section class="card results-card" id="results" hidden>
+        <h2>Результаты</h2>
+        <div id="summary" class="summary"></div>
+        <div id="extra" class="extra-stats"></div>
+        <div id="sections" class="sections"></div>
+        <div id="mass" class="mass-block"></div>
+        <div id="notes" class="notes"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Статический калькулятор · GitHub Pages · Python/FastAPI версия для локального запуска в README</p>
+    </footer>
+  </div>
+  <script src="js/data.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
