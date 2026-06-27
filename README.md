@@ -10,17 +10,21 @@
 
 Сайт: **https://mrandreano.github.io/foundry_app/**
 
-### Публикация
+### Публикация (один раз в настройках GitHub)
 
-1. Push в репозиторий:
-   ```bash
-   git remote add origin https://github.com/MrAndreano/foundry_app.git
-   git push -u origin main
-   ```
+1. Откройте **Settings → Pages** в репозитории  
+   https://github.com/MrAndreano/foundry_app/settings/pages
 
-2. **Settings → Pages → Build and deployment** → Source: **GitHub Actions**
+2. **Build and deployment → Source** → выберите **Deploy from a branch**
 
-3. Workflow `.github/workflows/pages.yml` деплоит папку `docs/` при каждом push в `main`.
+3. **Branch** → `gh-pages` → папка **`/ (root)`** → Save
+
+4. При каждом push в `main` workflow публикует содержимое папки `docs/` в ветку `gh-pages`.
+
+5. Сайт: **https://mrandreano.github.io/foundry_app/**  
+   (первый деплой — 1–3 минуты после включения Pages)
+
+> Если workflow уже запускался до настройки Pages — откройте **Actions** и нажмите **Re-run all jobs**.
 
 ### Локальный просмотр (без Python)
 
