@@ -1,8 +1,8 @@
-const LAYOUT_DIAGRAMS = {
-  side: { src: "img/head-side.svg", caption: "Боковая подводка: H<sub>р</sub> = H<sub>0</sub> − P − C/2 (рис. 2.3)" },
-  top: { src: "img/head-top.svg", caption: "Верхняя подводка: H<sub>р</sub> = H<sub>0</sub> (рис. 2.3)" },
-  siphon: { src: "img/head-siphon.svg", caption: "Сифонная подводка: H<sub>р</sub> = H<sub>0</sub> − C/2 (рис. 2.3)" },
-  symmetric: { src: "img/head-symmetric.svg", caption: "Симметричная подводка: H<sub>р</sub> = H<sub>0</sub> − C/8 (рис. 2.3)" },
+const LAYOUT_CAPTIONS = {
+  side: "Боковая подводка: H<sub>р</sub> = H<sub>0</sub> − P − C/2 (рис. 2.3)",
+  top: "Верхняя подводка: H<sub>р</sub> = H<sub>0</sub> (рис. 2.3)",
+  siphon: "Сифонная подводка: H<sub>р</sub> = H<sub>0</sub> − C/2 (рис. 2.3)",
+  symmetric: "Симметричная подводка: H<sub>р</sub> = H<sub>0</sub> − C/8 (рис. 2.3)",
 };
 
 function formatRatio(ratio) {
@@ -45,9 +45,9 @@ function initAlloys() {
 
 function updateLayoutDiagram() {
   const layout = document.getElementById("gating_layout").value;
-  const cfg = LAYOUT_DIAGRAMS[layout] || LAYOUT_DIAGRAMS.side;
-  document.getElementById("layout-diagram").src = cfg.src;
-  document.getElementById("layout-caption").innerHTML = cfg.caption;
+  const svg = FoundryDiagrams.layouts[layout] || FoundryDiagrams.layouts.side;
+  document.getElementById("layout-diagram").innerHTML = svg;
+  document.getElementById("layout-caption").innerHTML = LAYOUT_CAPTIONS[layout] || LAYOUT_CAPTIONS.side;
 
   const pField = document.getElementById("p-field");
   const pInput = document.getElementById("inlet_distance_mm");
@@ -224,4 +224,5 @@ document.getElementById("calc-form").addEventListener("submit", (e) => {
 });
 
 initAlloys();
+document.getElementById("system-diagram").innerHTML = FoundryDiagrams.system;
 updateLayoutDiagram();
