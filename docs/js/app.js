@@ -224,5 +224,5 @@ document.getElementById("calc-form").addEventListener("submit", (e) => {
 });
 
 initAlloys();
-document.getElementById("system-diagram").innerHTML = FoundryDiagrams.system;
-updateLayoutDiagram();
+if (typeof FoundryDiagrams !== "undefined") updateLayoutDiagram();
+else updateHeadPreview();

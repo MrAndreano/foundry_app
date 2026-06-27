@@ -45,8 +45,8 @@ async function loadAlloys() {
     select.appendChild(og);
   }
   updateAlloyInfo();
-  document.getElementById("system-diagram").innerHTML = FoundryDiagrams.system;
-  updateLayoutDiagram();
+  if (typeof FoundryDiagrams !== "undefined") updateLayoutDiagram();
+  else updateHeadPreview();
 }
 
 function formatRatio(ratio) {
