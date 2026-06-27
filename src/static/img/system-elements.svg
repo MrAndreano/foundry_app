@@ -1,25 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" role="img" aria-label="-;5<5=BK ;8B=8:>2>9 A8AB5<K">
-  <defs>
-    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-      <path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b"/>
-    </marker>
-  </defs>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="300" viewBox="0 0 520 300">
   <rect width="520" height="300" fill="#1a2332"/>
-  <!-- 2>@>=:0 -->
   <path d="M200 20 L260 20 L240 55 L220 55 Z" fill="#334155" stroke="#f59e0b"/>
-  <text x="270" y="40" fill="#e2e8f0" font-size="13">1. >@>=:0</text>
-  <!-- AB>O: -->
+  <text x="270" y="40" fill="#e2e8f0" font-size="13" font-family="Segoe UI,sans-serif">1. Funnel</text>
   <rect x="228" y="55" width="24" height="70" fill="#475569" stroke="#f59e0b"/>
-  <text x="270" y="95" fill="#e2e8f0" font-size="13">2. !B>O:</text>
-  <!-- :>;;5:B>@ -->
+  <text x="270" y="95" fill="#e2e8f0" font-size="13" font-family="Segoe UI,sans-serif">2. Sprue</text>
   <rect x="120" y="125" width="240" height="22" fill="#475569" stroke="#34d399"/>
-  <text x="270" y="140" fill="#e2e8f0" font-size="13">3. 8B=8:>2K9 E>4</text>
-  <!-- ?8B0B5;8 -->
+  <text x="270" y="140" fill="#e2e8f0" font-size="13" font-family="Segoe UI,sans-serif">3. Runner</text>
   <rect x="160" y="147" width="16" height="35" fill="#64748b" stroke="#f59e0b"/>
   <rect x="252" y="147" width="16" height="35" fill="#64748b" stroke="#f59e0b"/>
-  <text x="270" y="200" fill="#e2e8f0" font-size="13">4. 8B0B5;L ’</text>
-  <!-- >B;82:0 -->
+  <text x="270" y="200" fill="#e2e8f0" font-size="13" font-family="Segoe UI,sans-serif">4. Gate</text>
   <rect x="100" y="182" width="280" height="80" rx="4" fill="#243044" stroke="#94a3b8" stroke-dasharray="4"/>
-  <text x="240" y="230" fill="#94a3b8" font-size="14" text-anchor="middle">>;>ABL D>@<K (>B;82:0)</text>
-  <line x1="240" y1="20" x2="240" y2="182" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="240" y="230" fill="#94a3b8" font-size="14" text-anchor="middle" font-family="Segoe UI,sans-serif">Casting cavity</text>
+  <line x1="240" y1="20" x2="240" y2="182" stroke="#f59e0b" stroke-width="1.5"/>
+  <polygon points="235,182 240,172 245,182" fill="#f59e0b"/>
 </svg>

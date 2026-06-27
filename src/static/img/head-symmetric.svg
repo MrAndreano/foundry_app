@@ -1,11 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320" role="img" aria-label=" 0AGQB H@  A8<<5B@8G=0O">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="320" viewBox="0 0 480 320">
   <rect width="480" height="320" fill="#1a2332"/>
   <rect x="40" y="30" width="400" height="260" fill="none" stroke="#475569" stroke-width="2"/>
   <line x1="40" y1="160" x2="440" y2="160" stroke="#64748b" stroke-dasharray="6"/>
   <rect x="180" y="120" width="120" height="80" fill="#243044" stroke="#94a3b8"/>
   <line x1="60" y1="50" x2="60" y2="160" stroke="#f59e0b" stroke-width="2"/>
-  <text x="68" y="110" fill="#f59e0b" font-size="14" font-weight="bold">H€</text>
+  <text x="68" y="110" fill="#f59e0b" font-size="14" font-weight="bold" font-family="Segoe UI,sans-serif">H0</text>
   <line x1="320" y1="120" x2="320" y2="200" stroke="#34d399" stroke-width="2"/>
-  <text x="328" y="165" fill="#34d399" font-size="14" font-weight="bold">C</text>
-  <text x="40" y="300" fill="#e2e8f0" font-size="13">H@ = H€  C/8  (@8A. 2.3, A8<<5B@8G=0O) · P = C/2</text>
+  <text x="328" y="165" fill="#34d399" font-size="14" font-weight="bold" font-family="Segoe UI,sans-serif">C</text>
+  <text x="40" y="300" fill="#e2e8f0" font-size="13" font-family="Segoe UI,sans-serif">Hr = H0 - C/8  (fig. 2.3 symmetric, P = C/2)</text>
 </svg>
