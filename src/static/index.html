@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Калькулятор литниковой системы</title>
-  <link rel="stylesheet" href="/static/styles.css?v=7">
+  <link rel="stylesheet" href="/static/styles.css?v=8">
 </head>
 <body class="view-mobile">
   <div class="layout">
@@ -85,66 +85,64 @@
               </div>
             </div>
 
-            <div class="screen-split">
-              <div class="screen-fields">
-                <label class="field">
-                  <span class="field-label">Тип литниковой системы</span>
-                  <select name="gating_system_class" id="gating_system_class"></select>
-                </label>
+            <div class="step2-flow">
+              <label class="field field-ls-select">
+                <span class="field-label">Тип литниковой системы</span>
+                <select name="gating_system_class" id="gating_system_class"></select>
+              </label>
 
-                <div id="s1-steel-fields" class="s1-variant" hidden>
-                  <label class="field">
-                    <span class="field-label">Температура заливки</span>
-                    <select name="steel_pour_temp" id="steel_pour_temp">
-                      <option value="normal">Нормальная</option>
-                      <option value="elevated">Повышенная</option>
-                    </select>
-                  </label>
-                  <label class="field">
-                    <span class="field-label">Способ подвода металла</span>
-                    <select name="steel_supply_method" id="steel_supply_method">
-                      <option value="bottom">Снизу или в толстостенные части</option>
-                      <option value="half">На половине высоты или ступенчатый</option>
-                      <option value="top">Сверху или в тонкие части</option>
-                    </select>
-                  </label>
-                </div>
-
-                <div id="s1-al-fields" class="s1-variant" hidden>
-                  <label class="field">
-                    <span class="field-label">Изготовление отливок</span>
-                    <select name="al_casting_method" id="al_casting_method">
-                      <option value="sand">В песчаных формах</option>
-                      <option value="metal_mold">В подогреваемых кокилях</option>
-                    </select>
-                  </label>
-                  <label class="field">
-                    <span class="field-label">Тип литниковой системы (для S₁)</span>
-                    <select name="al_ls_type" id="al_ls_type">
-                      <option value="conventional">Обычная</option>
-                      <option value="vertical_slot">Вертикально-щелевая</option>
-                    </select>
-                  </label>
-                </div>
-
-                <div id="s1-generic-note" class="s1-note" hidden></div>
-
-                <label class="field">
-                  <span class="field-label">Коэффициент S₁ (можно скорректировать)</span>
-                  <input type="number" name="s1_display" id="s1_display" min="0.1" step="0.01" required>
-                  <span class="field-hint" id="s1-source"></span>
-                </label>
-
-                <figure id="s1-table-figure" class="ref-hero ref-hero-sm" hidden>
-                  <img id="s1-table-img" class="ref-img" src="" alt="Таблица S₁">
-                  <figcaption id="s1-table-caption"></figcaption>
-                </figure>
-              </div>
-
-              <figure class="ref-hero ref-hero-side">
+              <figure class="ref-hero ref-hero-inline" id="ls-diagram">
                 <img id="s1-ref-img" class="ref-img" src="/static/img/book/3.png" alt="Схема литниковой системы">
                 <figcaption id="s1-ref-caption">Схема выбранной ЛС</figcaption>
               </figure>
+
+              <div id="s1-steel-fields" class="s1-variant" hidden>
+                <label class="field">
+                  <span class="field-label">Температура заливки</span>
+                  <select name="steel_pour_temp" id="steel_pour_temp">
+                    <option value="normal">Нормальная</option>
+                    <option value="elevated">Повышенная</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span class="field-label">Способ подвода металла</span>
+                  <select name="steel_supply_method" id="steel_supply_method">
+                    <option value="bottom">Снизу или в толстостенные части</option>
+                    <option value="half">На половине высоты или ступенчатый</option>
+                    <option value="top">Сверху или в тонкие части</option>
+                  </select>
+                </label>
+              </div>
+
+              <div id="s1-al-fields" class="s1-variant" hidden>
+                <label class="field">
+                  <span class="field-label">Изготовление отливок</span>
+                  <select name="al_casting_method" id="al_casting_method">
+                    <option value="sand">В песчаных формах</option>
+                    <option value="metal_mold">В подогреваемых кокилях</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span class="field-label">Тип литниковой системы (для S₁)</span>
+                  <select name="al_ls_type" id="al_ls_type">
+                    <option value="conventional">Обычная</option>
+                    <option value="vertical_slot">Вертикально-щелевая</option>
+                  </select>
+                </label>
+              </div>
+
+              <div id="s1-generic-note" class="s1-note" hidden></div>
+
+              <figure id="s1-table-figure" class="ref-hero ref-hero-sm" hidden>
+                <img id="s1-table-img" class="ref-img" src="" alt="Таблица S₁">
+                <figcaption id="s1-table-caption"></figcaption>
+              </figure>
+
+              <label class="field">
+                <span class="field-label">Коэффициент S₁ (можно скорректировать)</span>
+                <input type="number" name="s1_display" id="s1_display" min="0.1" step="0.01" required>
+                <span class="field-hint" id="s1-source"></span>
+              </label>
             </div>
           </div>
         </section>
@@ -250,8 +248,8 @@
     </footer>
   </div>
 
-  <script src="/static/reference-images.js?v=7"></script>
-  <script src="/static/s1-coefficients.js?v=7"></script>
-  <script src="/static/app.js?v=7"></script>
+  <script src="/static/reference-images.js?v=8"></script>
+  <script src="/static/s1-coefficients.js?v=8"></script>
+  <script src="/static/app.js?v=8"></script>
 </body>
 </html>

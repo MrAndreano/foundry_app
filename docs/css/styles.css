@@ -157,6 +157,20 @@ body {
 .view-desktop .screen-fields { flex: 1; min-width: 0; }
 .view-desktop .ref-hero-side { flex: 0 0 42%; max-width: 420px; }
 
+/* Шаг 2: схема ЛС сразу под выбором */
+.step2-flow { max-width: 640px; }
+
+.field-ls-select { margin-bottom: 0.5rem; }
+
+.ref-hero-inline {
+  margin: 0 0 1.25rem;
+  transition: opacity 0.2s ease;
+}
+.ref-hero-inline.is-updating { opacity: 0.55; }
+
+.view-desktop .ref-hero-inline { max-width: 520px; }
+.view-mobile .ref-hero-inline { margin-bottom: 1rem; }
+
 .wizard-nav {
   display: flex;
   gap: 0.75rem;

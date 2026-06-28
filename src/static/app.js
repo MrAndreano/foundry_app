@@ -249,7 +249,11 @@ function updateGatingDiagram() {
   const id = parseInt(document.getElementById("gating_system_class").value, 10);
   const ref = REFERENCE_IMAGES[id];
   if (!ref) return;
-  document.getElementById("s1-ref-img").src = ref.file;
+  const fig = document.getElementById("ls-diagram");
+  const img = document.getElementById("s1-ref-img");
+  fig?.classList.add("is-updating");
+  img.onload = () => fig?.classList.remove("is-updating");
+  img.src = ref.file;
   document.getElementById("s1-ref-caption").textContent = ref.caption;
 }
 
