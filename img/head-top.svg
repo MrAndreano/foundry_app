@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="320" viewBox="0 0 480 320">
+  <rect width="480" height="320" fill="#1a2332"/>
+  <rect x="40" y="30" width="400" height="260" fill="none" stroke="#475569" stroke-width="2"/>
+  <rect x="160" y="100" width="160" height="120" fill="#243044" stroke="#94a3b8"/>
+  <line x1="60" y1="50" x2="60" y2="220" stroke="#f59e0b" stroke-width="2"/>
+  <text x="68" y="140" fill="#f59e0b" font-size="14" font-weight="bold" font-family="Segoe UI,sans-serif">H0</text>
+  <rect x="230" y="80" width="20" height="20" fill="#64748b" stroke="#f59e0b"/>
+  <text x="40" y="300" fill="#e2e8f0" font-size="13" font-family="Segoe UI,sans-serif">Hr = H0  (fig. 2.3 top, P = 0)</text>
+</svg>
