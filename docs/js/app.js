@@ -1,8 +1,8 @@
 const LAYOUT_CAPTIONS = {
-  side: "Боковая подводка: H<sub>р</sub> = H<sub>0</sub> − P − C/2 (рис. 2.3)",
-  top: "Верхняя подводка: H<sub>р</sub> = H<sub>0</sub> (рис. 2.3)",
-  siphon: "Сифонная подводка: H<sub>р</sub> = H<sub>0</sub> − C/2 (рис. 2.3)",
-  symmetric: "Симметричная подводка: H<sub>р</sub> = H<sub>0</sub> − C/8 (рис. 2.3)",
+  side: "Рис. 2.3 · боковая подводка: H<sub>р</sub> = H<sub>0</sub> − P − C/2",
+  top: "Рис. 2.3 · верхняя подводка: H<sub>р</sub> = H<sub>0</sub>",
+  siphon: "Рис. 2.3 · сифонная подводка: H<sub>р</sub> = H<sub>0</sub> − C/2",
+  symmetric: "Рис. 2.3 · симметричная: H<sub>р</sub> = H<sub>0</sub> − C/8",
 };
 
 function formatRatio(ratio) {
@@ -23,6 +23,29 @@ function updateAlloyInfo() {
   if (!alloy) return (info.innerHTML = "");
   const type = alloy.system_type === "constricting" ? "сужающаяся" : "расширяющаяся";
   info.innerHTML = `<strong>${alloy.name}</strong> · ${type}<br>ρ=${alloy.density_kg_m3} · μ=${alloy.discharge_coefficient_wet}/${alloy.discharge_coefficient_dry} · ${formatRatio(alloy.area_ratio)}${alloy.notes ? `<br><em>${alloy.notes}</em>` : ""}`;
+  updateCoeffTable(alloy.id);
+}
+
+function updateCoeffTable(alloyId) {
+  const figure = document.getElementById("coeff-table-figure");
+  const tableId = getCoeffTableId(alloyId);
+  if (!tableId) {
+    figure.hidden = true;
+    return;
+  }
+  const ref = REFERENCE_IMAGES[tableId];
+  figure.hidden = false;
+  document.getElementById("ref-coeff-img").src = ref.file;
+  document.getElementById("ref-coeff-img").alt = ref.caption;
+  document.getElementById("ref-coeff-caption").textContent = ref.caption;
+}
+
+function updateSystemIllustration() {
+  const id = parseInt(document.getElementById("system-illustration").value, 10);
+  const ref = REFERENCE_IMAGES[id];
+  document.getElementById("ref-system-img").src = ref.file;
+  document.getElementById("ref-system-img").alt = ref.caption;
+  document.getElementById("system-caption").textContent = ref.caption;
 }
 
 function initAlloys() {
@@ -45,9 +68,10 @@ function initAlloys() {
 
 function updateLayoutDiagram() {
   const layout = document.getElementById("gating_layout").value;
-  const svg = FoundryDiagrams.layouts[layout] || FoundryDiagrams.layouts.side;
-  document.getElementById("layout-diagram").innerHTML = svg;
-  document.getElementById("layout-caption").innerHTML = LAYOUT_CAPTIONS[layout] || LAYOUT_CAPTIONS.side;
+  const headRef = REFERENCE_IMAGES[7];
+  document.getElementById("ref-head-img").src = headRef.file;
+  document.getElementById("layout-caption").innerHTML =
+    `${headRef.caption} · ${LAYOUT_CAPTIONS[layout] || LAYOUT_CAPTIONS.side}`;
 
   const pField = document.getElementById("p-field");
   const pInput = document.getElementById("inlet_distance_mm");
@@ -205,6 +229,7 @@ function runCalculation(form) {
 
 document.getElementById("alloy_id").addEventListener("change", updateAlloyInfo);
 document.getElementById("gating_layout").addEventListener("change", updateLayoutDiagram);
+document.getElementById("system-illustration").addEventListener("change", updateSystemIllustration);
 ["sprue_height_mm", "casting_height_mm", "inlet_distance_mm"].forEach((id) => {
   document.getElementById(id).addEventListener("input", () => {
     const layout = document.getElementById("gating_layout").value;
@@ -224,5 +249,5 @@ document.getElementById("calc-form").addEventListener("submit", (e) => {
 });
 
 initAlloys();
-if (typeof FoundryDiagrams !== "undefined") updateLayoutDiagram();
-else updateHeadPreview();
+updateLayoutDiagram();
+updateSystemIllustration();

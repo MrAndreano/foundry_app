@@ -82,8 +82,13 @@ input:focus, select:focus { outline: 2px solid rgba(245, 158, 11, 0.45); border-
 .diagram-figure { margin: 0; background: var(--surface-2); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
 .diagram-figure img,
 .diagram-figure svg,
-.diagram-svg svg { display: block; width: 100%; height: auto; }
+.diagram-svg svg,
+.ref-img { display: block; width: 100%; height: auto; background: #fff; }
 .diagram-svg { line-height: 0; }
+.ref-figure { margin-bottom: 1rem; background: var(--surface-2); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+.ref-caption { margin: 0; padding: 0.5rem 0.75rem; font-size: 0.78rem; color: var(--muted); border-top: 1px solid var(--border); }
+.ref-select-label { padding: 0.5rem 0.75rem 0; margin: 0; font-size: 0.8rem; }
+.ref-select-label select { margin-top: 0.35rem; }
 .diagram-figure figcaption { padding: 0.5rem 0.75rem; font-size: 0.78rem; color: var(--muted); border-top: 1px solid var(--border); }
 .head-preview { background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.35); border-radius: 8px; padding: 0.65rem 0.85rem; font-size: 0.9rem; color: var(--text); margin-bottom: 0.5rem; }
 .head-preview strong { color: var(--success); }

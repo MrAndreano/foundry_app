@@ -1,11 +1,15 @@
 let alloys = [];
 
 const LAYOUT_CAPTIONS = {
-  side: "Боковая подводка: H<sub>р</sub> = H<sub>0</sub> − P − C/2 (рис. 2.3)",
-  top: "Верхняя подводка: H<sub>р</sub> = H<sub>0</sub> (рис. 2.3)",
-  siphon: "Сифонная подводка: H<sub>р</sub> = H<sub>0</sub> − C/2 (рис. 2.3)",
-  symmetric: "Симметричная подводка: H<sub>р</sub> = H<sub>0</sub> − C/8 (рис. 2.3)",
+  side: "Рис. 2.3 · боковая подводка: H<sub>р</sub> = H<sub>0</sub> − P − C/2",
+  top: "Рис. 2.3 · верхняя подводка: H<sub>р</sub> = H<sub>0</sub>",
+  siphon: "Рис. 2.3 · сифонная подводка: H<sub>р</sub> = H<sub>0</sub> − C/2",
+  symmetric: "Рис. 2.3 · симметричная: H<sub>р</sub> = H<sub>0</sub> − C/8",
 };
+
+function formatRatio(ratio) {
+  return ratio.join(":");
+}
 
 function mmToM(mm) {
   return mm != null && !Number.isNaN(mm) ? mm / 1000 : undefined;
@@ -27,6 +31,37 @@ function calcStaticHead(layout, h0, c, p) {
   return [Math.max(head, 0.01), formula];
 }
 
+function updateAlloyInfo() {
+  const alloy = alloys.find((a) => a.id === document.getElementById("alloy_id").value);
+  const info = document.getElementById("alloy-info");
+  if (!alloy) return (info.innerHTML = "");
+  const type = alloy.system_type === "constricting" ? "сужающаяся" : "расширяющаяся";
+  info.innerHTML = `<strong>${alloy.name}</strong> · ${type}<br>ρ=${alloy.density_kg_m3} · μ=${alloy.discharge_coefficient_wet}/${alloy.discharge_coefficient_dry} · ${formatRatio(alloy.area_ratio)}${alloy.notes ? `<br><em>${alloy.notes}</em>` : ""}`;
+  updateCoeffTable(alloy.id);
+}
+
+function updateCoeffTable(alloyId) {
+  const figure = document.getElementById("coeff-table-figure");
+  const tableId = getCoeffTableId(alloyId);
+  if (!tableId) {
+    figure.hidden = true;
+    return;
+  }
+  const ref = REFERENCE_IMAGES[tableId];
+  figure.hidden = false;
+  document.getElementById("ref-coeff-img").src = ref.file;
+  document.getElementById("ref-coeff-img").alt = ref.caption;
+  document.getElementById("ref-coeff-caption").textContent = ref.caption;
+}
+
+function updateSystemIllustration() {
+  const id = parseInt(document.getElementById("system-illustration").value, 10);
+  const ref = REFERENCE_IMAGES[id];
+  document.getElementById("ref-system-img").src = ref.file;
+  document.getElementById("ref-system-img").alt = ref.caption;
+  document.getElementById("system-caption").textContent = ref.caption;
+}
+
 async function loadAlloys() {
   alloys = await (await fetch("/api/alloys")).json();
   const select = document.getElementById("alloy_id");
@@ -45,27 +80,16 @@ async function loadAlloys() {
     select.appendChild(og);
   }
   updateAlloyInfo();
-  if (typeof FoundryDiagrams !== "undefined") updateLayoutDiagram();
-  else updateHeadPreview();
-}
-
-function formatRatio(ratio) {
-  return ratio.map((v) => (Number.isInteger(v) ? v : v)).join(":");
-}
-
-function updateAlloyInfo() {
-  const alloy = alloys.find((a) => a.id === document.getElementById("alloy_id").value);
-  const info = document.getElementById("alloy-info");
-  if (!alloy) return (info.innerHTML = "");
-  const type = alloy.system_type === "constricting" ? "сужающаяся" : "расширяющаяся";
-  info.innerHTML = `<strong>${alloy.name}</strong> · ${type}<br>ρ=${alloy.density_kg_m3} · μ=${alloy.discharge_coefficient_wet}/${alloy.discharge_coefficient_dry} · ${formatRatio(alloy.area_ratio)}${alloy.notes ? `<br><em>${alloy.notes}</em>` : ""}`;
+  updateLayoutDiagram();
+  updateSystemIllustration();
 }
 
 function updateLayoutDiagram() {
   const layout = document.getElementById("gating_layout").value;
-  const svg = FoundryDiagrams.layouts[layout] || FoundryDiagrams.layouts.side;
-  document.getElementById("layout-diagram").innerHTML = svg;
-  document.getElementById("layout-caption").innerHTML = LAYOUT_CAPTIONS[layout] || LAYOUT_CAPTIONS.side;
+  const headRef = REFERENCE_IMAGES[7];
+  document.getElementById("ref-head-img").src = headRef.file;
+  document.getElementById("layout-caption").innerHTML =
+    `${headRef.caption} · ${LAYOUT_CAPTIONS[layout] || LAYOUT_CAPTIONS.side}`;
 
   const pField = document.getElementById("p-field");
   const pInput = document.getElementById("inlet_distance_mm");
@@ -109,10 +133,6 @@ function int(form, name) {
   return v !== undefined && v !== "" ? parseInt(v, 10) : undefined;
 }
 
-function checked(form, name) {
-  return form.elements[name]?.checked === true;
-}
-
 function buildPayload(form) {
   let wallMm = num(form, "wall_thickness_mm");
   const mass = num(form, "casting_mass_kg");
@@ -126,7 +146,7 @@ function buildPayload(form) {
   else if (layout === "siphon") pMm = cMm;
   else if (layout === "symmetric") pMm = cMm / 2;
 
-  const payload = {
+  const p = {
     alloy_id: form.alloy_id.value,
     casting_mass_kg: mass,
     riser_mass_kg: num(form, "riser_mass_kg") ?? 0,
@@ -135,8 +155,8 @@ function buildPayload(form) {
     feeder_count: int(form, "feeder_count") ?? 1,
     collector_count: int(form, "collector_count") ?? 1,
     mold_moisture: form.mold_moisture.value,
-    filter_screen: checked(form, "filter_screen"),
-    thin_walled: checked(form, "thin_walled"),
+    filter_screen: form.filter_screen.checked,
+    thin_walled: form.thin_walled.checked,
     steel_wall_type: form.steel_wall_type?.value ?? "thick",
     feeder_attachment: form.feeder_attachment?.value ?? "to_riser",
     gating_layout: layout,
@@ -158,20 +178,19 @@ function buildPayload(form) {
 
   for (const k of ["static_head_m", "pouring_time_s", "discharge_coefficient", "overrun_factor", "area_ratio_feeder", "area_ratio_collector", "area_ratio_sprue"]) {
     const v = num(form, k);
-    if (v !== undefined) payload[k] = k === "overrun_factor" ? v / 100 : v;
+    if (v !== undefined) p[k] = k === "overrun_factor" ? v / 100 : v;
   }
   const tol = num(form, "iteration_tolerance");
-  if (tol !== undefined) payload.iteration_tolerance = tol / 100;
+  if (tol !== undefined) p.iteration_tolerance = tol / 100;
 
-  delete payload._wall_auto;
-  return { payload, wallAuto, wallMm };
+  return p;
 }
 
-function renderResults(r, meta) {
+function renderResults(r, payload) {
   document.getElementById("results").hidden = false;
 
   const autoParts = [];
-  if (meta.wallAuto) autoParts.push(`δ ≈ ${meta.wallMm} мм (оценка по массе)`);
+  if (payload._wall_auto) autoParts.push(`δ ≈ ${payload.wall_thickness_mm} мм (оценка по массе)`);
   autoParts.push(`τ: ${r.pouring_time_formula}`);
   autoParts.push(`H<sub>р</sub>: ${r.static_head_formula}`);
   document.getElementById("auto-info").innerHTML = `<p>Автоматически: ${autoParts.join(" · ")}</p>`;
@@ -183,18 +202,14 @@ function renderResults(r, meta) {
     <div class="stat"><div class="stat-label">Hр</div><div class="stat-value">${r.static_head_m} м</div></div>
     <div class="stat"><div class="stat-label">μ</div><div class="stat-value">${r.discharge_coefficient}</div></div>
     <div class="stat"><div class="stat-label">Fпит:Fколл:Fст</div><div class="stat-value">${r.area_ratio}</div></div>`;
-
   document.getElementById("extra").innerHTML = `
     <div class="extra-grid">
       <div><span>ν стояк</span><strong>${r.velocities.sprue_m_s} м/с</strong></div>
       <div><span>ν коллектор</span><strong>${r.velocities.collector_m_s} м/с</strong></div>
       <div><span>ν питатель</span><strong>${r.velocities.feeder_m_s} м/с</strong></div>
-      <div><span>ν всплытия шлака</span><strong>${r.velocities.slag_float_m_s} м/с</strong></div>
       <div><span>dст / dст.в</span><strong>${r.sprue_bottom_diameter_mm} / ${r.sprue_top_diameter_mm} мм</strong></div>
       <div><span>lколл min</span><strong>${r.collector_min_length_mm} мм</strong></div>
-      ${r.filter_screen_area_mm2 ? `<div><span>F сетки</span><strong>${r.filter_screen_area_mm2.toLocaleString("ru-RU")} мм²</strong></div>` : ""}
     </div>`;
-
   const sections = [
     { name: r.funnel.name, flow: r.funnel.mass_flow_kg_s, dim: r.funnel.description },
     { name: r.sprue.name, area: r.sprue.area_mm2, dim: r.sprue.dimensions.description, v: r.sprue.dimensions.velocity_m_s },
@@ -202,29 +217,46 @@ function renderResults(r, meta) {
     { name: r.feeder_single.name, area: r.feeder_single.area_mm2, dim: r.feeder_single.dimensions.description, v: r.feeder_single.dimensions.velocity_m_s },
     { name: r.feeder_total.name, area: r.feeder_total.area_mm2, dim: r.feeder_total.dimensions.description },
   ];
-
   document.getElementById("sections").innerHTML = sections.map((s) => `
     <div class="section-item"><h3>${s.name}</h3>
     ${s.flow != null ? `<div class="section-area section-flow">${s.flow} кг/с</div>` : `<div class="section-area">${s.area.toLocaleString("ru-RU")} мм²</div>`}
     <div class="section-dim">${s.dim}${s.v != null ? ` · ν=${s.v} м/с` : ""}</div></div>`).join("");
-
   const m = r.mass_breakdown;
-  document.getElementById("mass").innerHTML = `
-    <h3 class="mass-title">Gл.с (${m.iteration_count} итер.)</h3>
+  document.getElementById("mass").innerHTML = `<h3 class="mass-title">Gл.с (${m.iteration_count} итер.)</h3>
     <div class="extra-grid">
       <div><span>Питатели</span><strong>${m.feeder_kg} кг</strong></div>
       <div><span>Коллектор</span><strong>${m.collector_kg} кг</strong></div>
       <div><span>Стояк</span><strong>${m.sprue_kg} кг</strong></div>
       <div><span>Σ</span><strong>${m.total_kg} кг</strong></div>
     </div>`;
+  document.getElementById("notes").innerHTML = r.notes.map((n) => `<p class="${n.startsWith("⚠") ? "warning" : ""}">${n}</p>`).join("");
+}
 
-  document.getElementById("notes").innerHTML = r.notes.map(
-    (n) => `<p class="${n.startsWith("⚠") ? "warning" : ""}">${n}</p>`
-  ).join("");
+function runCalculation(form) {
+  form.querySelector(".error")?.remove();
+  const payload = buildPayload(form);
+  delete payload._wall_auto;
+  fetch("/api/calculate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  })
+    .then(async (res) => {
+      if (!res.ok) throw new Error((await res.json()).detail || "Ошибка расчёта");
+      return res.json();
+    })
+    .then((r) => renderResults(r, payload))
+    .catch((err) => {
+      const div = document.createElement("div");
+      div.className = "error";
+      div.textContent = err.message;
+      form.appendChild(div);
+    });
 }
 
 document.getElementById("alloy_id").addEventListener("change", updateAlloyInfo);
 document.getElementById("gating_layout").addEventListener("change", updateLayoutDiagram);
+document.getElementById("system-illustration").addEventListener("change", updateSystemIllustration);
 ["sprue_height_mm", "casting_height_mm", "inlet_distance_mm"].forEach((id) => {
   document.getElementById(id).addEventListener("input", () => {
     const layout = document.getElementById("gating_layout").value;
@@ -238,25 +270,9 @@ document.getElementById("gating_layout").addEventListener("change", updateLayout
   });
 });
 
-document.getElementById("calc-form").addEventListener("submit", async (e) => {
+document.getElementById("calc-form").addEventListener("submit", (e) => {
   e.preventDefault();
-  const form = e.target;
-  form.querySelector(".error")?.remove();
-  try {
-    const { payload, wallAuto, wallMm } = buildPayload(form);
-    const res = await fetch("/api/calculate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) throw new Error((await res.json()).detail || "Ошибка расчёта");
-    renderResults(await res.json(), { wallAuto, wallMm });
-  } catch (err) {
-    const div = document.createElement("div");
-    div.className = "error";
-    div.textContent = err.message;
-    form.appendChild(div);
-  }
+  runCalculation(e.target);
 });
 
 loadAlloys();
