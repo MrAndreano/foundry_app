@@ -46,7 +46,15 @@
     },
   };
 
-  global.SYSTEM_ILLUSTRATION_IDS = [3, 4, 5, 6];
+  global.REFERENCE_IMAGE_LIST = [
+    { id: 7, label: "Рис. 2.3 — расчётный напор Hр (H₀, C, P)" },
+    { id: 1, label: "Таблица S₁ — стальные отливки" },
+    { id: 2, label: "Таблица S₁ — алюминиевые сплавы" },
+    { id: 3, label: "Рис. 1.2 — ЛС класса I, газопроницаемые стенки" },
+    { id: 4, label: "Рис. 1.3 — ЛС класса I, газонепроницаемые стенки" },
+    { id: 5, label: "Рис. 1.4 — ЛС класса II, вид IIА" },
+    { id: 6, label: "Рис. 1.5 — ЛС класса II, вид IIB" },
+  ];
 
   global.getCoeffTableId = function (alloyId) {
     for (const id of [1, 2]) {
