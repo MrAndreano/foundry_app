@@ -190,6 +190,15 @@ body {
   padding-bottom: 0.5rem;
 }
 
+/* Telegram Mini App */
+.is-telegram .layout {
+  padding-top: max(0.5rem, env(safe-area-inset-top));
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+.is-telegram .view-toggle { display: none; }
+.is-telegram .wizard-nav .btn-primary { display: none; }
+.is-telegram .wizard-nav .btn-secondary:not(:disabled) { flex: 1; }
+
 .btn-secondary {
   flex: 0 0 auto;
   min-width: 6rem;

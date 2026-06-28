@@ -72,6 +72,41 @@ python scripts/export_alloys.py
 
 Обновит `docs/js/data.js` для GitHub Pages.
 
+## Telegram Mini App
+
+Калькулятор уже подходит для Telegram Mini App: **HTTPS**, статический расчёт в браузере, мобильный мастер.
+
+### Что добавлено в код
+
+- `docs/js/telegram.js` — инициализация Web App SDK
+- Кнопки Telegram **«Далее» / «Назад»** дублируют шаги мастера
+- В Telegram автоматически включается мобильный режим
+
+### Настройка бота (без кода)
+
+1. Создайте бота: [@BotFather](https://t.me/BotFather) → `/newbot`
+2. Привяжите Mini App:
+   ```
+   /newapp
+   ```
+   или для существующего бота:
+   ```
+   /mybots → ваш бот → Bot Settings → Menu Button → Configure menu button
+   ```
+3. URL приложения:
+   ```
+   https://mrandreano.github.io/foundry_app/
+   ```
+4. Опционально — кнопка в сообщении (через Bot API):
+   ```json
+   {
+     "text": "Открыть калькулятор",
+     "web_app": { "url": "https://mrandreano.github.io/foundry_app/" }
+   }
+   ```
+
+Сервер для расчёта **не нужен** — достаточно GitHub Pages.
+
 ## Источник
 
 [Чуркин Б.С. — Проектирование и расчёт литниковых систем](https://elar.uspu.ru/bitstream/ru-uspu/5566/1/978-5-8050-0483-5_2012.pdf)

@@ -105,6 +105,7 @@ function goToStep(step) {
   if (step === 2) updateS1Step();
   if (step === 3) updateLayoutDiagram();
   if (step === 4) window.scrollTo({ top: 0, behavior: "smooth" });
+  TelegramBridge?.syncWizard(step);
 }
 
 function onWizardNext() {
@@ -488,6 +489,13 @@ function bindEvents() {
 }
 
 initViewMode();
+TelegramBridge?.init({
+  onNext: () => document.getElementById("wizard-next").click(),
+  onBack: () => {
+    if (currentStep > 1) document.getElementById("wizard-back").click();
+    else window.Telegram?.WebApp?.close();
+  },
+});
 initWizardProgress();
 initGatingSystemSelect();
 initAlloys();
