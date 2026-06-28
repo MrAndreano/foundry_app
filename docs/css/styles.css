@@ -29,7 +29,201 @@ body {
 
 .layout { max-width: 820px; margin: 0 auto; padding: 1.5rem 1rem 2.5rem; }
 
-.header { margin-bottom: 1.75rem; }
+.view-desktop .layout { max-width: 980px; }
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.2rem;
+  flex-shrink: 0;
+}
+
+.view-btn {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.view-btn.is-active {
+  background: var(--surface-2);
+  color: var(--accent);
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+/* Wizard progress */
+.wizard-progress {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.progress-step {
+  flex: 1;
+  min-width: 4.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 0.5rem 0.35rem;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+.progress-step.is-current {
+  border-color: var(--accent);
+  color: var(--text);
+  background: rgba(245, 158, 11, 0.08);
+}
+.progress-step.is-done {
+  border-color: rgba(52, 211, 153, 0.4);
+  color: var(--success);
+}
+.progress-num {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+.progress-step.is-current .progress-num { background: var(--accent); color: #111; }
+.progress-step.is-done .progress-num { background: rgba(52, 211, 153, 0.2); }
+
+/* Wizard screens */
+.wizard-shell {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.calc-form { margin: 0; }
+
+.wizard-screen {
+  display: none;
+  animation: fadeIn 0.25s ease;
+}
+.wizard-screen.is-active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.screen-inner {
+  padding: 1.25rem 1.25rem 0.5rem;
+  min-height: 18rem;
+}
+
+.screen-head {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  align-items: flex-start;
+}
+
+.screen-split {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.view-desktop .screen-split {
+  flex-direction: row;
+  align-items: flex-start;
+}
+.view-desktop .screen-fields { flex: 1; min-width: 0; }
+.view-desktop .ref-hero-side { flex: 0 0 42%; max-width: 420px; }
+
+.wizard-nav {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: rgba(15, 20, 25, 0.35);
+}
+
+.view-mobile .wizard-nav {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+}
+
+.view-mobile .layout {
+  padding-bottom: 0.5rem;
+}
+
+.btn-secondary {
+  flex: 0 0 auto;
+  min-width: 6rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--surface-2);
+  color: var(--text);
+}
+.btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.wizard-nav .btn-primary {
+  flex: 1;
+  margin-top: 0;
+}
+
+.s1-note {
+  background: var(--surface-2);
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+  border-left: 3px solid var(--blue);
+}
+
+.formula-hint { color: var(--muted); font-size: 0.85rem; }
+
+.results-loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--muted);
+}
+
+.stat-sm { font-size: 0.85rem !important; }
+
+.view-mobile h1 { font-size: 1.35rem; }
+.view-mobile .progress-label { display: none; }
+.view-mobile .screen-inner { min-height: calc(100dvh - 14rem); }
+
+.view-desktop .wizard-progress { margin-bottom: 1.25rem; }
+.view-desktop .progress-step { flex-direction: row; padding: 0.65rem 0.85rem; font-size: 0.82rem; }
+.view-desktop .progress-label { font-weight: 500; }
+
+.header { margin-bottom: 1rem; }
 .eyebrow { margin: 0 0 0.25rem; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
 h1 { margin: 0 0 0.5rem; font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 700; }
 .subtitle { margin: 0; color: var(--muted); font-size: 0.95rem; }

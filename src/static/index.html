@@ -4,173 +4,244 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Калькулятор литниковой системы</title>
-  <link rel="stylesheet" href="/static/styles.css?v=5">
+  <link rel="stylesheet" href="/static/styles.css?v=7">
 </head>
-<body>
+<body class="view-mobile">
   <div class="layout">
     <header class="header">
-      <p class="eyebrow">Калькулятор литниковой системы</p>
-      <h1>Расчёт площадей сечений ЛС</h1>
-      <p class="subtitle">Метод Озанна–Диттерта · учебник Чуркина (УГТУ-УПИ, 2012)<br>
-        Цепочка: <strong>воронка → стояк → коллектор → питатель</strong></p>
+      <div class="header-top">
+        <div>
+          <p class="eyebrow">Калькулятор литниковой системы</p>
+          <h1>Расчёт площадей сечений ЛС</h1>
+        </div>
+        <div class="view-toggle" role="group" aria-label="Режим отображения">
+          <button type="button" class="view-btn is-active" data-view="mobile" title="Мобильный мастер">📱</button>
+          <button type="button" class="view-btn" data-view="desktop" title="Десктопный мастер">🖥</button>
+        </div>
+      </div>
+      <p class="subtitle">Озанн–Диттерт · Чуркин (УГТУ-УПИ, 2012) · <strong>воронка → стояк → коллектор → питатель</strong></p>
     </header>
 
-    <main class="main-flow">
-      <form id="calc-form" class="calc-form">
+    <nav class="wizard-progress" id="wizard-progress" aria-label="Шаги расчёта"></nav>
 
-        <!-- ШАГ 1 -->
-        <section class="step-card">
-          <div class="step-header">
-            <span class="step-num">1</span>
-            <div>
-              <h2 class="step-title">Отливка и форма</h2>
-              <p class="step-desc">Укажите сплав и основные параметры. Время заливки τ, μ и соотношения площадей посчитаются сами.</p>
+    <main class="wizard-shell">
+      <form id="calc-form" class="calc-form" novalidate>
+        <input type="hidden" name="pouring_time_coefficient_s" id="s1_hidden">
+
+        <!-- ШАГ 1: Отливка -->
+        <section class="wizard-screen is-active" data-step="1" aria-labelledby="step-title-1">
+          <div class="screen-inner">
+            <div class="screen-head">
+              <span class="step-num">1</span>
+              <div>
+                <h2 class="step-title" id="step-title-1">Отливка и форма</h2>
+                <p class="step-desc">Сплав, масса и число питателей — остальное подставим сами.</p>
+              </div>
             </div>
-          </div>
 
-          <label class="field">
-            <span class="field-label">Сплав</span>
-            <select id="alloy_id" name="alloy_id" required></select>
-          </label>
-          <div id="alloy-info" class="alloy-info"></div>
+            <label class="field">
+              <span class="field-label">Сплав</span>
+              <select id="alloy_id" name="alloy_id" required></select>
+            </label>
+            <div id="alloy-info" class="alloy-info"></div>
 
-          <div class="field-grid field-grid-2">
-            <label class="field">
-              <span class="field-label">Масса отливки, кг</span>
-              <input type="number" name="casting_mass_kg" value="12" min="0.01" step="0.01" required>
-            </label>
-            <label class="field">
-              <span class="field-label">Сколько питателей</span>
-              <input type="number" name="feeder_count" value="6" min="1" max="32">
-            </label>
-            <label class="field">
-              <span class="field-label">Форма</span>
-              <select name="mold_moisture">
-                <option value="wet">Сырая</option>
-                <option value="dry">Сухая</option>
-              </select>
-            </label>
-            <label class="field">
-              <span class="field-label">Толщина стенки δ, мм</span>
-              <input type="number" name="wall_thickness_mm" id="wall_thickness_mm" placeholder="Оставьте пустым — оценим по массе" min="0.1" step="0.1">
-            </label>
-          </div>
+            <div class="field-grid field-grid-2">
+              <label class="field">
+                <span class="field-label">Масса отливки, кг</span>
+                <input type="number" name="casting_mass_kg" value="12" min="0.01" step="0.01" required>
+              </label>
+              <label class="field">
+                <span class="field-label">Сколько питателей</span>
+                <input type="number" name="feeder_count" value="6" min="1" max="32">
+              </label>
+              <label class="field">
+                <span class="field-label">Форма</span>
+                <select name="mold_moisture">
+                  <option value="wet">Сырая</option>
+                  <option value="dry">Сухая</option>
+                </select>
+              </label>
+              <label class="field">
+                <span class="field-label">Толщина стенки δ, мм</span>
+                <input type="number" name="wall_thickness_mm" id="wall_thickness_mm" placeholder="Пусто — оценим по массе" min="0.1" step="0.1">
+              </label>
+            </div>
 
-          <div class="options-row">
-            <label class="check-label"><input type="checkbox" name="filter_screen" value="1"> Есть фильтровальная сетка</label>
-            <label class="check-label"><input type="checkbox" name="thin_walled" value="1"> Тонкостенная отливка</label>
+            <div class="options-row">
+              <label class="check-label"><input type="checkbox" name="filter_screen" value="1"> Фильтровальная сетка</label>
+              <label class="check-label"><input type="checkbox" name="thin_walled" value="1"> Тонкостенная отливка</label>
+            </div>
           </div>
         </section>
 
-        <!-- ШАГ 2 -->
-        <section class="step-card">
-          <div class="step-header">
-            <span class="step-num">2</span>
-            <div>
-              <h2 class="step-title">Геометрия для расчёта H<sub>р</sub></h2>
-              <p class="step-desc">Посмотрите на рисунок и введите размеры в миллиметрах — так же, как подписано на схеме.</p>
+        <!-- ШАГ 2: ЛС и S₁ -->
+        <section class="wizard-screen" data-step="2" aria-labelledby="step-title-2">
+          <div class="screen-inner">
+            <div class="screen-head">
+              <span class="step-num">2</span>
+              <div>
+                <h2 class="step-title" id="step-title-2">Литниковая система и S₁</h2>
+                <p class="step-desc">Выберите тип ЛС и условия заливки — предложим S₁ из таблицы учебника.</p>
+              </div>
             </div>
-          </div>
 
-          <figure class="ref-hero">
-            <img id="ref-head-img" class="ref-img" src="/static/img/book/7.png" alt="Расчётный напор Hр">
-            <figcaption>Рис. 2.3 из учебника — где брать H<sub>0</sub>, C и P</figcaption>
-          </figure>
+            <div class="screen-split">
+              <div class="screen-fields">
+                <label class="field">
+                  <span class="field-label">Тип литниковой системы</span>
+                  <select name="gating_system_class" id="gating_system_class"></select>
+                </label>
 
-          <label class="field">
-            <span class="field-label">Как металл заходит в отливку</span>
-            <select name="gating_layout" id="gating_layout">
-              <option value="side">Сбоку (самый частый случай)</option>
-              <option value="top">Сверху</option>
-              <option value="siphon">Сифоном</option>
-              <option value="symmetric">Симметрично</option>
-            </select>
-          </label>
+                <div id="s1-steel-fields" class="s1-variant" hidden>
+                  <label class="field">
+                    <span class="field-label">Температура заливки</span>
+                    <select name="steel_pour_temp" id="steel_pour_temp">
+                      <option value="normal">Нормальная</option>
+                      <option value="elevated">Повышенная</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span class="field-label">Способ подвода металла</span>
+                    <select name="steel_supply_method" id="steel_supply_method">
+                      <option value="bottom">Снизу или в толстостенные части</option>
+                      <option value="half">На половине высоты или ступенчатый</option>
+                      <option value="top">Сверху или в тонкие части</option>
+                    </select>
+                  </label>
+                </div>
 
-          <div id="layout-formula" class="formula-box"></div>
+                <div id="s1-al-fields" class="s1-variant" hidden>
+                  <label class="field">
+                    <span class="field-label">Изготовление отливок</span>
+                    <select name="al_casting_method" id="al_casting_method">
+                      <option value="sand">В песчаных формах</option>
+                      <option value="metal_mold">В подогреваемых кокилях</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span class="field-label">Тип литниковой системы (для S₁)</span>
+                    <select name="al_ls_type" id="al_ls_type">
+                      <option value="conventional">Обычная</option>
+                      <option value="vertical_slot">Вертикально-щелевая</option>
+                    </select>
+                  </label>
+                </div>
 
-          <div class="field-grid field-grid-3">
-            <label class="field field-tag-h0" id="field-h0">
-              <span class="field-label"><span class="dim-tag">H<sub>0</sub></span> Высота столба металла, мм</span>
-              <input type="number" name="sprue_height_mm" id="sprue_height_mm" value="250" min="10" step="1">
-              <span class="field-hint">От металла в воронке до разъёма формы</span>
-            </label>
-            <label class="field field-tag-c" id="field-c">
-              <span class="field-label"><span class="dim-tag">C</span> Высота отливки, мм</span>
-              <input type="number" name="casting_height_mm" id="casting_height_mm" value="34" min="0" step="1">
-            </label>
-            <label class="field field-tag-p" id="p-field">
-              <span class="field-label"><span class="dim-tag">P</span> До места входа питателя, мм</span>
-              <input type="number" name="inlet_distance_mm" id="inlet_distance_mm" value="12" min="0" step="1">
-              <span class="field-hint">От верха отливки до питателя</span>
-            </label>
-          </div>
+                <div id="s1-generic-note" class="s1-note" hidden></div>
 
-          <div id="head-preview" class="result-preview">
-            <span class="result-preview-label">Получится статический напор</span>
-            <span class="result-preview-value">H<sub>р</sub> ≈ <strong>0,212 м</strong></span>
+                <label class="field">
+                  <span class="field-label">Коэффициент S₁ (можно скорректировать)</span>
+                  <input type="number" name="s1_display" id="s1_display" min="0.1" step="0.01" required>
+                  <span class="field-hint" id="s1-source"></span>
+                </label>
+
+                <figure id="s1-table-figure" class="ref-hero ref-hero-sm" hidden>
+                  <img id="s1-table-img" class="ref-img" src="" alt="Таблица S₁">
+                  <figcaption id="s1-table-caption"></figcaption>
+                </figure>
+              </div>
+
+              <figure class="ref-hero ref-hero-side">
+                <img id="s1-ref-img" class="ref-img" src="/static/img/book/3.png" alt="Схема литниковой системы">
+                <figcaption id="s1-ref-caption">Схема выбранной ЛС</figcaption>
+              </figure>
+            </div>
           </div>
         </section>
 
-        <!-- Справка -->
-        <details class="help-book">
-          <summary>Справочные рисунки и таблицы из учебника</summary>
-          <p class="help-book-intro">Таблицы S₁ для стали и алюминия, типы литниковых систем (класс I и II).</p>
-          <label class="field">
-            <span class="field-label">Выберите рисунок / таблицу</span>
-            <select id="help-image-select"></select>
-          </label>
-          <figure class="ref-hero ref-hero-sm">
-            <img id="help-image" class="ref-img" src="" alt="">
-            <figcaption id="help-caption"></figcaption>
-          </figure>
-        </details>
-
-        <!-- Расширенные -->
-        <details class="advanced-section">
-          <summary>Дополнительные параметры (необязательно)</summary>
-          <div class="field-grid field-grid-2">
-            <label class="field">Масса прибылей, кг <input type="number" name="riser_mass_kg" value="0" min="0" step="0.01"></label>
-            <label class="field">Отливок в форме <input type="number" name="castings_per_mold" value="1" min="1" max="32"></label>
-            <label class="field">Коллекторов <input type="number" name="collector_count" value="1" min="1" max="8"></label>
-            <label class="field">H<sub>р</sub> вручную, м <input type="number" name="static_head_m" placeholder="Авто" min="0.01" step="0.001"></label>
-            <label class="field">τ вручную, с <input type="number" name="pouring_time_s" placeholder="Авто" min="0.1" step="0.1"></label>
-            <label class="field">μ вручную <input type="number" name="discharge_coefficient" placeholder="Из базы" min="0.01" max="1" step="0.01"></label>
-          </div>
-          <details class="advanced-nested">
-            <summary>Формы сечений и соотношения</summary>
-            <div class="field-grid field-grid-3">
-              <label class="field">Форма стояка <select name="sprue_shape"><option value="circle">Круг</option><option value="square">Квадрат</option></select></label>
-              <label class="field">Форма коллектора <select name="collector_shape"><option value="trapezoid">Трапеция</option><option value="rectangle">Прямоугольник</option><option value="circle">Круг</option><option value="square">Квадрат</option></select></label>
-              <label class="field">Форма питателя <select name="feeder_shape"><option value="trapezoid">Трапеция</option><option value="rectangle">Прямоугольник</option><option value="circle">Круг</option><option value="square">Квадрат</option></select></label>
+        <!-- ШАГ 3: Геометрия -->
+        <section class="wizard-screen" data-step="3" aria-labelledby="step-title-3">
+          <div class="screen-inner">
+            <div class="screen-head">
+              <span class="step-num">3</span>
+              <div>
+                <h2 class="step-title" id="step-title-3">Геометрия для H<sub>р</sub></h2>
+                <p class="step-desc">Размеры с рисунка — в миллиметрах.</p>
+              </div>
             </div>
-          </details>
-        </details>
 
-        <button type="submit" class="btn-primary btn-calc">Рассчитать литниковую систему</button>
+            <div class="screen-split">
+              <div class="screen-fields">
+                <label class="field">
+                  <span class="field-label">Как металл заходит в отливку</span>
+                  <select name="gating_layout" id="gating_layout">
+                    <option value="side">Сбоку (частый случай)</option>
+                    <option value="top">Сверху</option>
+                    <option value="siphon">Сифоном</option>
+                    <option value="symmetric">Симметрично</option>
+                  </select>
+                </label>
+                <div id="layout-formula" class="formula-box"></div>
+
+                <div class="field-grid field-grid-3">
+                  <label class="field field-tag-h0" id="field-h0">
+                    <span class="field-label"><span class="dim-tag">H<sub>0</sub></span> Столб металла, мм</span>
+                    <input type="number" name="sprue_height_mm" id="sprue_height_mm" value="250" min="10" step="1">
+                  </label>
+                  <label class="field field-tag-c" id="field-c">
+                    <span class="field-label"><span class="dim-tag">C</span> Высота отливки, мм</span>
+                    <input type="number" name="casting_height_mm" id="casting_height_mm" value="34" min="0" step="1">
+                  </label>
+                  <label class="field field-tag-p" id="p-field">
+                    <span class="field-label"><span class="dim-tag">P</span> До питателя, мм</span>
+                    <input type="number" name="inlet_distance_mm" id="inlet_distance_mm" value="12" min="0" step="1">
+                  </label>
+                </div>
+
+                <div id="head-preview" class="result-preview"></div>
+
+                <details class="advanced-section">
+                  <summary>Дополнительно (необязательно)</summary>
+                  <div class="field-grid field-grid-2">
+                    <label class="field">Масса прибылей, кг <input type="number" name="riser_mass_kg" value="0" min="0" step="0.01"></label>
+                    <label class="field">Отливок в форме <input type="number" name="castings_per_mold" value="1" min="1" max="32"></label>
+                    <label class="field">Коллекторов <input type="number" name="collector_count" value="1" min="1" max="8"></label>
+                    <label class="field">H<sub>р</sub> вручную, м <input type="number" name="static_head_m" placeholder="Авто" min="0.01" step="0.001"></label>
+                  </div>
+                </details>
+              </div>
+
+              <figure class="ref-hero ref-hero-side">
+                <img id="ref-head-img" class="ref-img" src="/static/img/book/7.png" alt="Расчётный напор Hр">
+                <figcaption>Рис. 2.3 — H<sub>0</sub>, C, P</figcaption>
+              </figure>
+            </div>
+          </div>
+        </section>
+
+        <!-- ШАГ 4: Результаты -->
+        <section class="wizard-screen" data-step="4" aria-labelledby="step-title-4">
+          <div class="screen-inner">
+            <div class="screen-head">
+              <span class="step-num">4</span>
+              <div>
+                <h2 class="step-title" id="step-title-4">Результаты расчёта</h2>
+                <p class="step-desc">Площади сечений и размеры элементов литниковой системы.</p>
+              </div>
+            </div>
+
+            <div id="results-loading" class="results-loading" hidden>Считаем…</div>
+            <div id="results-error" class="error" hidden></div>
+
+            <div id="results-body">
+              <div id="auto-info" class="auto-info"></div>
+              <div id="summary" class="summary"></div>
+              <h3 class="block-title">Элементы ЛС</h3>
+              <div id="sections" class="sections"></div>
+              <h3 class="block-title">Дополнительно</h3>
+              <div id="extra" class="extra-stats"></div>
+              <h3 class="block-title">Масса литниковой системы</h3>
+              <div id="mass" class="mass-block"></div>
+              <div id="notes" class="notes"></div>
+            </div>
+          </div>
+        </section>
+
+        <div class="wizard-nav">
+          <button type="button" class="btn-secondary" id="wizard-back" disabled>Назад</button>
+          <button type="button" class="btn-primary" id="wizard-next">Далее</button>
+        </div>
       </form>
-
-      <section class="card results-card" id="results">
-        <div id="results-placeholder" class="results-placeholder">
-          <span class="step-num step-num-muted">3</span>
-          <div>
-            <h2 class="step-title">Результаты</h2>
-            <p>Заполните шаги 1–2 и нажмите кнопку расчёта. Здесь появятся площади сечений и размеры элементов.</p>
-          </div>
-        </div>
-        <div id="results-body" hidden>
-          <h2 class="results-heading">Результаты расчёта</h2>
-          <div id="auto-info" class="auto-info"></div>
-          <div id="summary" class="summary"></div>
-          <h3 class="block-title">Элементы литниковой системы</h3>
-          <div id="sections" class="sections"></div>
-          <h3 class="block-title">Дополнительно</h3>
-          <div id="extra" class="extra-stats"></div>
-          <h3 class="block-title">Масса литниковой системы</h3>
-          <div id="mass" class="mass-block"></div>
-          <div id="notes" class="notes"></div>
-        </div>
-      </section>
     </main>
 
     <footer class="footer">
@@ -178,7 +249,9 @@
         <a href="reference.pdf" target="_blank" rel="noopener">PDF учебника</a></p>
     </footer>
   </div>
-  <script src="/static/reference-images.js?v=5"></script>
-  <script src="/static/app.js?v=5"></script>
+
+  <script src="/static/reference-images.js?v=7"></script>
+  <script src="/static/s1-coefficients.js?v=7"></script>
+  <script src="/static/app.js?v=7"></script>
 </body>
 </html>
